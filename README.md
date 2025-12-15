@@ -1,10 +1,10 @@
-# Telegram Media Downloader Bot
+# Telegram YouTube Downloader Bot
 
-A powerful Telegram bot built with Go that downloads videos and audio from YouTube, Facebook, and Instagram with multiple quality options.
+A focused Telegram bot built with Go that downloads videos and audio from YouTube (single videos and playlists) with multiple quality options.
 
 ## Features
 
-- ✅ **Multi-platform support**: YouTube, Facebook, Instagram
+- ✅ **Platform support**: YouTube (videos, shorts, playlists)
 - 🎬 **Video downloads**: Multiple quality options (360p, 480p, 720p, 1080p, Best)
 - 🎵 **Audio downloads**: MP3 with multiple bitrates (128kbps, 192kbps, 320kbps, Best)
 - 🚀 **Fast and efficient**: Built with Go for optimal performance
@@ -21,7 +21,7 @@ Before running the bot, ensure you have the following installed:
    go version
    ```
 
-2. **yt-dlp** - A powerful video downloader
+2. **yt-dlp** - A powerful video downloader (required)
    ```bash
    # Install on Linux/macOS
    sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
@@ -55,19 +55,16 @@ Before running the bot, ensure you have the following installed:
 
 ## Installation
 
-1. **Clone or navigate to the project directory**
+1. **Clone the repository**
    ```bash
-   cd /home/milanmadusanka/Projects/yt-bot
+   git clone https://github.com/Milanz247/Yt-Video-mp3-downloader.bot-telegram.git
+   cd Yt-Video-mp3-downloader.bot-telegram
    ```
 
-2. **Create environment file**
+2. **Create environment file** and set your Telegram bot token
    ```bash
    cp .env.example .env
-   ```
-
-3. **Edit the `.env` file** with your bot token (already configured):
-   ```
-   TELEGRAM_BOT_TOKEN=8266088482:AAE1zZjqDQ4puqZKa5DgW-6tbJaeVE5YN6Q
+   # Edit .env and set TELEGRAM_BOT_TOKEN to your bot token
    ```
 
 4. **Install Go dependencies**
@@ -79,6 +76,13 @@ Before running the bot, ensure you have the following installed:
    ```bash
    go build -o yt-bot
    ```
+
+Or run the setup script which checks/install prerequisites and builds the bot:
+
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
 ## Usage
 
@@ -97,9 +101,10 @@ go run main.go
 1. **Start the bot**: Send `/start` to receive a welcome message
 2. **Get help**: Send `/help` to see usage instructions
 3. **Download media**:
-   - Send a YouTube, Facebook, or Instagram video link
-   - Select your preferred quality and format from the interactive buttons
-   - Wait for the bot to process and send your file
+   - Send a YouTube video or playlist link
+   - If a playlist is detected you'll get playlist options (single item, first N items, or "View all items")
+   - Use the interactive buttons to choose format/quality and start download
+   - The bot will send files back to you when ready
 
 ### Supported Quality Options
 
@@ -118,9 +123,8 @@ go run main.go
 
 ## Example Links to Test
 
-- **YouTube**: `https://www.youtube.com/watch?v=VIDEO_ID`
-- **Facebook**: `https://www.facebook.com/watch?v=VIDEO_ID`
-- **Instagram**: `https://www.instagram.com/p/POST_ID/` or `https://www.instagram.com/reel/REEL_ID/`
+- **YouTube (video)**: `https://www.youtube.com/watch?v=VIDEO_ID`
+- **YouTube (playlist)**: `https://www.youtube.com/playlist?list=PLAYLIST_ID` or `https://www.youtube.com/watch?v=VIDEO_ID&list=PLAYLIST_ID`
 
 ## Project Structure
 
@@ -137,15 +141,17 @@ yt-bot/
 
 ## Configuration
 
-The bot can be configured through environment variables in the `.env` file:
+The bot is configured through the `.env` file. At minimum set:
 
 - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token (required)
 
+Optionally you can add `cookies.txt` (exported from your browser) in the project root if you want to try downloading geo-restricted or protected content (may not be necessary for YouTube).
+
 ## Limitations
 
-- Maximum file size: 50MB (Telegram's limit for bot uploads)
-- Private/restricted videos may not be downloadable
-- Some platforms may have rate limiting
+- Maximum file size: 50MB (Telegram's standard limit for bot uploads). The bot will tell you if a file is too large and suggest lower quality.
+- Private/restricted videos or region-restricted content may not be downloadable without cookies or special handling.
+- Playlist downloads of large playlists are limited (the UI fetches and lists the first 25 items for selection); you can download the first N items using the playlist buttons.
 
 ## Troubleshooting
 
@@ -194,14 +200,15 @@ MIT License - Feel free to use and modify as needed.
 
 Contributions are welcome! Feel free to submit issues or pull requests.
 
-## Support
+## Creator & Support
 
-If you encounter any issues or have questions:
-1. Check the Troubleshooting section
-2. Ensure all prerequisites are installed
-3. Verify your bot token is correct
-4. Check yt-dlp is up to date
+Created by: **Milan Madusanka** (GitHub: @Milanz247)
+
+If you need help:
+1. Check Troubleshooting above
+2. Ensure prerequisites are installed and `yt-dlp` is up to date (`yt-dlp -U`)
+3. Open an issue in the GitHub repo
 
 ---
 
-**Made with ❤️ using Go and yt-dlp**
+**Made with ❤️ by Milan Madusanka using Go and yt-dlp**

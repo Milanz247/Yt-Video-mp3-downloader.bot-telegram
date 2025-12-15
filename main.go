@@ -61,6 +61,16 @@ func main() {
 		urlCache:     make(map[string]string),
 	}
 
+	// Register bot commands (makes the bot interface modern in Telegram clients)
+	commands := []tgbotapi.BotCommand{
+		{Command: "start", Description: "Start the bot and show welcome"},
+		{Command: "help", Description: "Show help and usage"},
+		{Command: "latest", Description: "Show latest features"},
+	}
+	if _, err := bot.Request(tgbotapi.NewSetMyCommands(commands)); err != nil {
+		log.Printf("Failed to set bot commands: %v", err)
+	}
+
 	// Check if yt-dlp is installed
 	if !mediaBot.checkYtDlp() {
 		log.Fatal("yt-dlp is not installed. Please install it: https://github.com/yt-dlp/yt-dlp")
@@ -137,26 +147,41 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) {
 }
 
 func (b *Bot) sendWelcomeMessage(chatID int64) {
-	text := `🎥 *Welcome to YouTube Downloader Bot!*
+	// Prefer local welcome image if present, else use a default image URL
+	welcomeLocal := "assets/welcome.jpg"
+	welcomeURL := "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200&q=80&auto=format&fit=crop"
 
-I can download videos and audio from:
-✅ YouTube (videos and playlists)
+	caption := `🎥 *Welcome to YouTube Downloader Bot!*
 
-*How to use:*
-1. Send me a YouTube video or playlist link
-2. Choose the quality and format you want
-3. I'll download and send it to you!
+I can download YouTube videos and playlists. Send a link to get started.`
 
-Supported formats:
-🎬 Video (various qualities)
-🎵 MP3 audio (various bitrates)
-📋 Full playlists (with options)
+	// Build inline keyboard for a modern look
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📥 Send a link", "help"),
+			tgbotapi.NewInlineKeyboardButtonURL("📚 Examples", "https://github.com/Milanz247/Yt-Video-mp3-downloader.bot-telegram#example-links-to-test"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("❓ Help", "help"),
+			tgbotapi.NewInlineKeyboardButtonData("⚙️ Settings", "settings"),
+		),
+	)
 
-Send me a link to get started!`
+	if _, err := os.Stat(welcomeLocal); err == nil {
+		photo := tgbotapi.NewPhoto(chatID, tgbotapi.FilePath(welcomeLocal))
+		photo.Caption = caption
+		photo.ParseMode = "Markdown"
+		photo.ReplyMarkup = keyboard
+		b.api.Send(photo)
+		return
+	}
 
-	msg := tgbotapi.NewMessage(chatID, text)
-	msg.ParseMode = "Markdown"
-	b.api.Send(msg)
+	// Fallback to external image URL
+	photo := tgbotapi.NewPhoto(chatID, tgbotapi.FileURL(welcomeURL))
+	photo.Caption = caption
+	photo.ParseMode = "Markdown"
+	photo.ReplyMarkup = keyboard
+	b.api.Send(photo)
 }
 
 func (b *Bot) sendHelpMessage(chatID int64) {
@@ -325,6 +350,20 @@ func (b *Bot) handleCallbackQuery(query *tgbotapi.CallbackQuery) {
 			b.api.Request(callback)
 			// Send quality options for this specific video
 			b.sendQualityOptions(query.Message.Chat.ID, videoURL, "youtube")
+			return
+		}
+		if parts[0] == "help" {
+			// Show help message
+			callback := tgbotapi.NewCallback(query.ID, "Opening help...")
+			b.api.Request(callback)
+			b.sendHelpMessage(query.Message.Chat.ID)
+			return
+		}
+		if parts[0] == "settings" {
+			callback := tgbotapi.NewCallback(query.ID, "Opening settings...")
+			b.api.Request(callback)
+			msg := tgbotapi.NewMessage(query.Message.Chat.ID, "⚙️ Settings are minimal for now — send /help for instructions.")
+			b.api.Send(msg)
 			return
 		}
 	}

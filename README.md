@@ -106,6 +106,15 @@ go run main.go
    - Use the interactive buttons to choose format/quality and start download
    - The bot will send files back to you when ready
 
+### Modern UI
+
+- When you send `/start` the bot will send a welcome image (if `assets/welcome.jpg` exists it will be used, otherwise a hosted image is used) and a modern inline keyboard with quick actions:
+   - "Send a link" – quick entry to send a link
+   - "Examples" – link to README examples
+   - "Help" and "Settings" quick actions
+
+You can provide your own `assets/welcome.jpg` (recommended size ~1200x600) to brand the bot.
+
 ### Supported Quality Options
 
 **Video Formats:**

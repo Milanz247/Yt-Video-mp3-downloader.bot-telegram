@@ -1,0 +1,33 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+yt-bot
+
+# Test binary
+*.test
+
+# Output
+*.out
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+
+# Downloaded files
+downloads/
+*.mp4
+*.mp3
+*.webm
+*.mkv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
